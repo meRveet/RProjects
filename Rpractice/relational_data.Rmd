@@ -1,0 +1,74 @@
+---
+title: "Relational Data"
+author: "MT"
+date: "7/13/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+###Prerequisites
+```{r}
+library(tidyverse)
+library(nycflights13)
+```
+
+###Exploring Datat
+```{r}
+airlines
+unique(airports$faa)
+planes
+weather
+flights
+```
+
+###Checking for Primary Keys
+```{r}
+planes %>%
+        count(tailnum) %>%
+        filter(n>1) #Using conditional filters to determine if any count is >1
+
+weather %>%
+        count(year,month,day,hour,origin) %>%
+        filter(n>1)
+
+flights %>%
+        count(year, month, day, flight) %>%
+        filter(n>1)
+        
+```
+###Exercises 13.3.1, Qn1
+```{r}
+flights1<- flights %>% mutate(flights, row_number())
+head(flights1)
+```
+###Exercises 13.3.1, Qn2
+```{r}
+view(head(Lahman::Batting))
+view(head(Lahman::People))
+view(head(Lahman::Salaries))
+```
+Lahman linked by playerID varible
+
+###Exercise 13.4.6
+```{r}
+flights %>%
+        left_join(airports, c("dest"="faa")) %>%
+        ggplot(aes(lon,lat)) +
+        borders("state") +
+        geom_point(aes(size = "dep_delay")) +
+        coord_quickmap()
+                  
+airports
+
+airports %>%
+  semi_join(flights, c("faa" = "dest")) %>%
+        left_join(flights, c("faa"="dest")) %>%
+        ggplot(aes(lon, lat)) +
+        borders("state") +
+        geom_point(aes(colour="arr_delay")) +
+        coord_quickmap()
+```
+

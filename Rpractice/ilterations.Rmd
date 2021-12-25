@@ -1,0 +1,143 @@
+---
+title: "Ilterations"
+author: "MT"
+date: "7/20/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+head(mtcars)
+
+output<- vector("double", ncol(mtcars))
+output
+
+for (i in seq_along(mtcars)) {
+        output[[i]]<- mean(mtcars[[i]])
+}
+
+output
+
+
+
+```
+###Performing For Loops
+```{r}
+output<- vector("character", ncol(flights))
+for (i in seq_along(flights)) {
+        output[[i]]<- typeof(flights[[i]])
+}
+output
+
+str(nycflights13::flights)
+
+
+```
+###Performing For Loops Variations
+using unlist helps to flaten a vector of list into one list. 
+```{r}
+out <- vector("list", length(means))
+for (i in seq_along(means)) {
+  n <- sample(100, 1)
+  out[[i]] <- rnorm(n, means[[i]])
+}
+str(out)
+str(unlist(out))
+
+```
+
+```{r}
+iris
+
+
+show_mean<- function(x) {
+        z<- tibble()
+        y<- x %>% select(ends_with(c("length", "width")))
+        for (i in seq_along(y)) {
+                z[[i]]<- mean(y[[i]])
+        
+        }
+z
+}
+dim(z)
+show_mean(iris)
+
+```
+
+
+```{r}
+
+y<- iris %>% select(ends_with(c("length", "width")))
+z<- vector("list", ncol(y))
+for (i in seq_along(y)) {
+        z[[i]]<- mean(y[[i]])
+        names(z[[i]])<- names(y[i])
+        }
+names(y[1])
+```
+```{r}
+show_mean <- function(df){
+  meanvalue<- sapply(df, mean)
+  cbind(meanvalue[!is.na(meanvalue)])
+  }
+
+show_mean(iris)
+```
+
+
+```{r}
+models <- mtcars %>% 
+  split(.$cyl) %>% 
+  map(~lm(mpg ~ wt, data = .))
+
+models %>%
+  map(summary) 
+%>%
+  map_dbl (~.$r.squared)
+
+models[2]
+```
+
+
+```{r}
+mu<- list (5,10,-3)
+mu %>%
+  map(rnorm, n=5) %>%
+  str()
+
+rnorm(5,-3)
+
+sigma <- list(1, 5, 10)
+
+seq_along(mu) %>%
+  map(~rnorm(5,mu[[.]],sigma[[.]])) %>% str()
+
+map2(mu, sigma, rnorm, n = 5) %>% str()
+
+map2
+
+n <- 5
+args1 <- list(n, mu, sigma)
+args1 %>%
+  pmap(rnorm) %>% 
+  str()
+rnorm(5,3,5)
+
+
+params <- tribble(
+  ~mean, ~sd, ~n,
+    5,     1,  1,
+   10,     5,  3,
+   -3,    10,  5
+)
+
+x<-tribble(
+  ~a, ~b, ~c,
+  "a", 1, 1.1
+)
+view(x)
+
+```

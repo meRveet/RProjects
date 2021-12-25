@@ -1,0 +1,94 @@
+---
+title: "Factors"
+author: "MT"
+date: "7/13/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+```{r}
+library(forcats)
+library(tidyr)
+library(ggplot2)
+```
+
+```{r}
+gss_cat
+```
+
+```{r}
+gss_cat %>%
+        count(race)
+```
+
+
+ggplot dropped values that does not have values. but it can be forced to display
+```{r}
+ggplot(gss_cat, aes(race)) +
+        geom_bar()
+```
+
+```{r}
+ggplot(gss_cat, aes(race)) +
+        geom_bar()+
+        scale_x_discrete(drop=F)
+
+```
+
+```{r}
+
+
+ggplot(gss_cat, aes(relig)) +
+        geom_bar()+
+        scale_x_discrete(drop=F)
+
+```
+```{r}
+
+gss_cat %>%
+        count(denom)
+```
+```{r}
+relig_summary
+
+relig_summary <- gss_cat %>%
+        group_by(relig) %>%
+  summarise(
+    age = mean(age, na.rm = TRUE),
+    tvhours = mean(tvhours, na.rm = TRUE),
+    n = n()
+  )
+ggplot(relig_summary, aes(tvhours, relig)) +
+        geom_point()
+
+ggplot(relig_summary, aes(tvhours, fct_reorder(relig,tvhours))) +
+        geom_point()
+```
+```{r}
+relig_summary %>%
+  mutate(relig = fct_reorder(relig, tvhours)) 
+%>%
+        ggplot(aed(tvhours,relig))+
+        geom_point()
+```
+
+
+```{r}
+gss_cat %>%
+  mutate(marital = marital %>% 
+                 fct_infreq()) %>%
+  ggplot(aes(marital)) +
+    geom_bar()
+
+```
+
+```{r}
+
+gss_cat %>%
+  mutate(rincome = fct_lump(rincome)) %>%
+  count(rincome)
+
+```
+

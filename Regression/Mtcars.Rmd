@@ -1,0 +1,100 @@
+---
+title: "Motor Cars"
+author: "MT"
+date: "12/18/2020"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Executive Summary
+The report will include analysis of car transmission and estimate the relationship between each of the variables from mtcars dataset. Using regression models, prediction models were also generated to help determine which is the best fit for the dataset collected.
+
+# Exploring Dataset
+
+```{r}
+library(datasets)
+data(mtcars)
+summary(mtcars)
+mtcars$cyl <- factor(mtcars$cyl)
+mtcars$vs <- factor(mtcars$vs)
+mtcars$gear <- factor(mtcars$gear)
+mtcars$carb <- factor(mtcars$carb)
+mtcars$am <- factor(mtcars$am,labels=c('Automatic','Manual'))
+boxplot(mpg~am, mtcars, xlab="Transmission Type")
+
+```
+Based on the boxplot, it can be observes that there might be a significant difference in MPG for the different transmission.
+
+#Simple linear Regression Model
+```{r}
+mpgam<- lm(mpg~factor(am), mtcars)
+summary(mpgam)
+```
+Looking at the single variate model, the R^2 values were only 0.3598. Which also means that only 35.9% of variance can be explained by this model and does not provide a good fit to the dataset observed. Hence, other predictors are to be further assessed for any influence to create a better fit of model. 
+
+#Multivariate Regression Model
+```{r}
+mpgam_all<- lm(mpg~., mtcars)
+summary(mpgam_all)
+mpgam_cor<- lm(mpg~am+cyl+disp+hp+wt, mtcars)
+mpgam_cor_nowt<- lm(mpg~am+cyl+hp+disp, mtcars)
+mpgam_cor_noam<- lm(mpg~cyl+hp+disp, mtcars)
+mpgam_cor_nodisp<- lm(mpg~am+cyl+hp+wt, data=mtcars)
+mpgam_cor_noamdisp<- lm(mpg~cyl+hp+wt, data=mtcars)
+anova(mpgam_all,
+      mpgam_cor, 
+      mpgam_cor_nowt,
+      mpgam_cor_noam,
+      mpgam_cor_nodisp, 
+      mpgam_cor_noamdisp)
+```
+```{r eval=FALSE, include=FALSE}
+step(mpgam_all,direction = "both")
+```
+
+Looking at the models fitted and compared with anova analysis, it shows that while there are correlations. Model fitted with `cyl`, `hp`, `wt`, `am` would fit the dataset better with the lowest RSS. With the p-value below 0.05, we cannot reject the null hypothesis that `cyl`, `hp` and `wt` does not have an influence. Using stepwise analysis also confirms the same final four variable to be the best variable to be included as the predictors of the model. 
+
+
+#Analysis and Conclusion
+##Inference
+```{r}
+summary (mpgam_cor_nodisp)
+par(mfrow = c(2, 2))
+plot(mpgam_cor_nodisp)
+t.test(mpg ~ am, data = mtcars)
+```
+Basing on the summary, the adjusted R^2 suggests that the predicted model is able to conclude 84% of the variability. T-Test also shows shows that automatic and manual are significantly different from each other. 
+
+The points in residuals vs.Fitted plots seem to be randomly scattered on showing that it is independent.
+The normal Q-Q plot consist of points which closely fits the line indicating that they are normal.
+The scale-location plot are scattered constantly, indicating constant variance.
+The leverage plots, showed that there are some points which may potentially have some strong influences.
+## Leverage Diagnosis
+```{r}
+lev<- hatvalues(mpgam_cor_nodisp)
+tail(sort(lev),3)
+tail(sort(dfbeta(mpgam_cor_nodisp)[,1]),3)
+```
+Based on the diagnostics, it seems like Toyota Corolla may portential have a strong influence to the model's prediction hence further assessment might be required to determine if it should be excluded. 
+
+##Conclusion to Questions
+1. “Is an automatic or manual transmission better for MPG”
+
+Manual transmission is better for MPG, as observed from the data, manual transmissions increase the mileage of each vehicle, however other variables can also influence the difference in mileage within vehicles with manual transmission too.
+
+2. "Quantify the MPG difference between automatic and manual transmissions" 
+The mean difference between automatic and manual transmission is 1.8. 
+ 
+ 
+#Appendix
+```{r message=FALSE, warning=FALSE}
+library(GGally)
+library(ggplot2)
+ggpairs(mtcars)
+```
+Plots showing the correlation between two variables, distribution and the scatterplots. The plot provides a quick exploratory analysis to identify the plots of interest. 

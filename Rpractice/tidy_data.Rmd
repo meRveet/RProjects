@@ -1,0 +1,130 @@
+---
+title: "12_tidy_data"
+author: "MT"
+date: "7/12/2021"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+table1
+table2
+table3
+table4a
+```
+
+```{r}
+table1 %>%
+        mutate(rate=cases/population*10000)
+
+table1 %>%
+        count(year, wt=cases)
+
+ggplot(table1, aes(year, cases)) +
+        geom_line(aes(group = country), colour = "grey50") +
+        geom_point(aes(colour = country))
+
+```
+###12.2.1 Exercises
+
+####Question 1
+table1. Observations of year, cases and population variables for each country. With multiple years in the same variable
+table2. Observations of year, type of data and count as variabl for each country. Each data is sorted by country followed by data type
+table3. Observation of rates group by country followed by their year observed. 
+table4a. Observation of counts with year as the variable and sorted by coutnry.
+
+####Question 2 and 3
+```{r}
+table2
+plot2<- table2 %>%
+        pivot_wider(names_from= type, values_from= count) %>%
+        mutate(rate=cases/population*10000)
+plot2
+ggplot(plot2, aes(year, cases)) +
+        geom_line(aes(group = country), colour = "grey50") +
+        geom_point(aes(colour = country))
+        
+```
+
+###Seperate
+```{r}
+table3 %>%
+        separate(rate,into=c("cases", "populaiton"), convert=T)
+```
+
+###Unite
+```{r}
+table5
+table5 %>%
+        unite(new,century, year, sep="")
+
+```
+
+###Missing Values
+```{r}
+stocks <- tibble(
+  year   = c(2015, 2015, 2015, 2015, 2016, 2016, 2016),
+  qtr    = c(   1,    2,    3,    4,    2,    3,    4),
+  return = c(1.88, 0.59, 0.35,   NA, 0.92, 0.17, 2.66)
+)
+
+stocks %>%
+        pivot_wider(names_from = year, values_from = return) %>% 
+  pivot_longer(
+    cols = c(`2015`, `2016`), 
+    names_to = "year", 
+    values_to = "return", 
+    values_drop_na = TRUE
+  )
+
+stocks %>% 
+  complete(year, qtr)
+
+```
+
+```{r}
+treatment <- tribble(
+  ~ person,           ~ treatment, ~response,
+  "Derrick Whitmore", 1,           7,
+  NA,                 2,           10,
+  NA,                 3,           9,
+  "Katherine Burke",  1,           4
+)
+
+treatment%>%
+        fill(person)
+```
+
+###Case Study
+```{r}
+who
+who1<- who %>%
+        pivot_longer(
+                cols=new_sp_m014:newrel_f65,
+                names_to= "key",
+                values_to= "cases",
+                values_drop_na= T
+        )
+who1
+
+who1 %>%
+        count(key) #to explore and see if there's any patterns in values
+unique(who1['key']) #to explore the unique values in key
+
+who2 <- who1 %>% #mutating existing table with new values before separating
+        mutate(key=stringr::str_replace(key,"newrel", "new_rel"))
+who2
+
+who3<- who2 %>%
+        separate(key,c("new", "type", "sexage"), sep="_")
+who3 %>%
+        count(new)
+unique(who3['new']) #see how many unique values and if column is useful
+
+who4<- who3 %>%
+        select(-iso3, -iso2, -new)
+who4
+```
+

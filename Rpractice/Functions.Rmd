@@ -1,0 +1,89 @@
+---
+title: "Functions"
+author: "MT"
+date: "7/19/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+```{r}
+f1 <- function(string, prefix) {
+  substr(string, 1, nchar(prefix)) == prefix
+}
+
+has_same_prefix<- function(string, prefix){
+        substr(string, 1, nchar(prefix))==prefix
+}
+
+has_same_prefix("test", "t")
+
+
+f2 <- function(x) {
+  if (length(x) <= 1) return(NULL)
+  x[-length(x)]
+}
+
+remove_last_vector<- function(vector_list) {
+  if (length(vector_list) <= 1) return(NULL)
+  vector_list[-length(vector_list)]
+}
+
+remove_last_vector(c(1,2,3,4))
+
+repeat_y<-function(vector_list, to_be_rep) {
+  rep(to_be_rep, length.out = length(vector_list))
+}
+
+repeat_y(1:99,5)
+
+rep(123123, length.out= 3)
+
+```
+```{r}
+has_name <- function(x) {
+  nms <- names(x)
+  if (is.null(nms)) {
+    rep(FALSE, length(x))
+  } else {
+    !is.na(nms) & nms != ""
+  }
+}
+
+
+```
+
+```{r}
+x<- function(x)
+switch("b",
+       a= 1+2,
+       b= 2+2)
+```
+```{r}
+complicated_function <- function(x, y, z) {
+  if (length(x) == 0 || length(y) == 0) {
+    return("abc")
+  }
+    
+  # Complicated code here
+}
+
+complicated_function(1,1,1)
+```
+```{r}
+show_missings <- function(df) {
+  n <- sum(is.na(df))
+  cat("Missing values: ", n, "\n", sep = "")
+  invisible(df)
+}
+
+a<- show_missings(mtcars)
+b<- show_missings(mtcars)
+class(a)
+class(b)
+
+
+
+```
+
